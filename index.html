@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>건국대학교 교수테니스회 회원명부</title>
+
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Malgun Gothic', '맑은 고딕', sans-serif;
@@ -24,288 +24,173 @@
       padding: 28px 20px 22px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.2);
     }
+    header h1 { font-size: 1.7rem; letter-spacing: 2px; font-weight: 700; }
+    header p  { font-size: 0.9rem; margin-top: 6px; opacity: 0.85; }
 
-    header h1 {
-      font-size: 1.7rem;
-      letter-spacing: 2px;
-      font-weight: 700;
+    /* ── Config Banner ── */
+    #config-banner {
+      background: #fff3cd;
+      border: 1.5px solid #ffc107;
+      border-radius: 10px;
+      max-width: 600px;
+      margin: 24px auto 0;
+      padding: 16px 20px;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: #664d03;
+    }
+    #config-banner strong { color: #8B0000; }
+    #config-banner code {
+      background: #f8e5a0;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 0.85rem;
     }
 
-    header p {
-      font-size: 0.9rem;
-      margin-top: 6px;
-      opacity: 0.85;
-    }
-
+    /* ── Form ── */
     .form-section {
       max-width: 600px;
-      margin: 32px auto 0;
+      margin: 28px auto 0;
       background: white;
       border-radius: 14px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       padding: 28px 32px;
     }
-
     .form-section h2 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #003087;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
+      font-size: 1.1rem; font-weight: 700; color: #003087;
+      margin-bottom: 20px; padding-bottom: 10px;
       border-bottom: 2px solid #e2e8f0;
     }
-
-    .form-group {
-      margin-bottom: 18px;
-    }
-
+    .form-group { margin-bottom: 18px; }
     .form-group label {
-      display: block;
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: #444;
-      margin-bottom: 7px;
+      display: block; font-size: 0.88rem; font-weight: 600;
+      color: #444; margin-bottom: 7px;
     }
-
     .form-group input[type="text"] {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1.5px solid #d1d9e0;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-family: inherit;
-      transition: border-color 0.2s;
-      outline: none;
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid #d1d9e0; border-radius: 8px;
+      font-size: 0.95rem; font-family: inherit;
+      transition: border-color 0.2s; outline: none;
     }
+    .form-group input[type="text"]:focus { border-color: #0055cc; }
 
-    .form-group input[type="text"]:focus {
-      border-color: #0055cc;
-    }
-
-    .photo-upload-area {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-    }
-
+    .photo-upload-area { display: flex; align-items: center; gap: 18px; }
     .photo-preview {
-      width: 80px;
-      height: 100px;
-      border-radius: 8px;
-      border: 2px dashed #c0ccd8;
-      background: #f8fafc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      flex-shrink: 0;
-      cursor: pointer;
+      width: 80px; height: 100px; border-radius: 8px;
+      border: 2px dashed #c0ccd8; background: #f8fafc;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; flex-shrink: 0; cursor: pointer;
     }
-
-    .photo-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
+    .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
     .photo-preview .placeholder {
-      font-size: 0.72rem;
-      color: #aab;
-      text-align: center;
-      line-height: 1.5;
-      padding: 8px;
+      font-size: 0.72rem; color: #aab; text-align: center;
+      line-height: 1.5; padding: 8px;
     }
-
     .upload-btn {
-      display: inline-block;
-      padding: 9px 18px;
-      background: #f0f4ff;
-      border: 1.5px solid #b0c4f0;
-      border-radius: 8px;
-      font-size: 0.88rem;
-      color: #0055cc;
-      cursor: pointer;
-      font-family: inherit;
-      font-weight: 600;
+      display: inline-block; padding: 9px 18px;
+      background: #f0f4ff; border: 1.5px solid #b0c4f0;
+      border-radius: 8px; font-size: 0.88rem; color: #0055cc;
+      cursor: pointer; font-family: inherit; font-weight: 600;
       transition: background 0.2s;
     }
-
-    .upload-btn:hover {
-      background: #dce8ff;
-    }
-
-    #photo-input {
-      display: none;
-    }
+    .upload-btn:hover { background: #dce8ff; }
+    #photo-input { display: none; }
 
     .submit-btn {
-      width: 100%;
-      padding: 13px;
+      width: 100%; padding: 13px;
       background: linear-gradient(135deg, #003087, #0055cc);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 700;
-      font-family: inherit;
-      cursor: pointer;
-      margin-top: 6px;
-      letter-spacing: 1px;
+      color: white; border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 700; font-family: inherit;
+      cursor: pointer; margin-top: 6px; letter-spacing: 1px;
       transition: opacity 0.2s, transform 0.1s;
     }
+    .submit-btn:hover { opacity: 0.92; }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
-    .submit-btn:hover {
-      opacity: 0.92;
-    }
-
-    .submit-btn:active {
-      transform: scale(0.98);
-    }
-
-    /* ── Members Section ── */
+    /* ── Members ── */
     .members-section {
-      max-width: 1100px;
-      margin: 36px auto 48px;
-      padding: 0 20px;
+      max-width: 1100px; margin: 36px auto 48px; padding: 0 20px;
     }
-
     .members-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 20px;
     }
-
-    .members-header h2 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #003087;
-    }
-
+    .members-header h2 { font-size: 1.15rem; font-weight: 700; color: #003087; }
     .member-count {
-      background: #003087;
-      color: white;
-      font-size: 0.82rem;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 20px;
+      background: #003087; color: white;
+      font-size: 0.82rem; font-weight: 700;
+      padding: 4px 12px; border-radius: 20px;
     }
-
     .members-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 20px;
     }
-
     .member-card {
-      background: white;
-      border-radius: 14px;
+      background: white; border-radius: 14px;
       box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-      overflow: hidden;
-      text-align: center;
-      position: relative;
+      overflow: hidden; text-align: center; position: relative;
       transition: transform 0.2s, box-shadow 0.2s;
     }
-
     .member-card:hover {
       transform: translateY(-3px);
       box-shadow: 0 8px 24px rgba(0,0,0,0.12);
     }
-
     .member-card .card-photo {
-      width: 100%;
-      aspect-ratio: 3/4;
-      object-fit: cover;
-      display: block;
-      background: #e8edf5;
+      width: 100%; aspect-ratio: 3/4;
+      object-fit: cover; display: block; background: #e8edf5;
     }
-
     .member-card .card-photo-placeholder {
-      width: 100%;
-      aspect-ratio: 3/4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 100%; aspect-ratio: 3/4;
+      display: flex; align-items: center; justify-content: center;
       background: linear-gradient(135deg, #dce8ff, #e8edf5);
       font-size: 3rem;
     }
-
-    .member-card .card-info {
-      padding: 12px 10px 14px;
-    }
-
+    .member-card .card-info { padding: 12px 10px 14px; }
     .member-card .card-name {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #1a1a2e;
-      margin-bottom: 5px;
+      font-size: 1rem; font-weight: 700; color: #1a1a2e; margin-bottom: 5px;
     }
-
-    .member-card .card-dept {
-      font-size: 0.78rem;
-      color: #5a6a85;
-      line-height: 1.4;
-    }
-
+    .member-card .card-dept { font-size: 0.78rem; color: #5a6a85; line-height: 1.4; }
     .member-card .delete-btn {
-      position: absolute;
-      top: 7px;
-      right: 7px;
-      width: 24px;
-      height: 24px;
-      background: rgba(220, 50, 50, 0.85);
-      border: none;
-      border-radius: 50%;
-      color: white;
-      font-size: 0.75rem;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      line-height: 1;
+      position: absolute; top: 7px; right: 7px;
+      width: 24px; height: 24px;
+      background: rgba(220,50,50,0.85); border: none;
+      border-radius: 50%; color: white; font-size: 0.75rem;
+      cursor: pointer; display: none;
+      align-items: center; justify-content: center;
+      font-weight: 700; line-height: 1;
     }
-
-    .member-card:hover .delete-btn {
-      display: flex;
-    }
+    .member-card:hover .delete-btn { display: flex; }
 
     .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: #9aabbf;
-      grid-column: 1 / -1;
+      text-align: center; padding: 60px 20px;
+      color: #9aabbf; grid-column: 1 / -1;
     }
+    .empty-state .empty-icon { font-size: 3.5rem; margin-bottom: 14px; }
+    .empty-state p { font-size: 0.95rem; }
 
-    .empty-state .empty-icon {
-      font-size: 3.5rem;
-      margin-bottom: 14px;
+    /* loading spinner */
+    .spinner {
+      display: inline-block; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite; vertical-align: middle;
+      margin-right: 6px;
     }
-
-    .empty-state p {
-      font-size: 0.95rem;
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Toast */
     .toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
+      position: fixed; bottom: 30px; left: 50%;
       transform: translateX(-50%) translateY(80px);
-      background: #222;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 30px;
-      font-size: 0.9rem;
-      font-weight: 600;
+      background: #222; color: white;
+      padding: 12px 24px; border-radius: 30px;
+      font-size: 0.9rem; font-weight: 600;
       transition: transform 0.3s ease;
-      z-index: 999;
-      pointer-events: none;
+      z-index: 999; pointer-events: none;
     }
-
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
@@ -315,6 +200,14 @@
   <p>Professor Tennis Club — Member Directory</p>
 </header>
 
+<!-- Supabase 설정 안내 (설정 완료 후 이 블록 삭제) -->
+<div id="config-banner">
+  ⚙️ <strong>설정 필요:</strong> 아래 JavaScript 코드 상단의
+  <code>SUPABASE_URL</code>과 <code>SUPABASE_ANON_KEY</code>를
+  본인의 Supabase 프로젝트 값으로 교체한 후 이 배너를 삭제하세요.<br>
+  설정 방법은 함께 제공된 <strong>SUPABASE_SETUP.md</strong>를 참고하세요.
+</div>
+
 <!-- 입력 폼 -->
 <div class="form-section">
   <h2>✏️ 회원 등록</h2>
@@ -322,13 +215,14 @@
   <div class="form-group">
     <label>사진</label>
     <div class="photo-upload-area">
-      <div class="photo-preview" id="preview-box" onclick="document.getElementById('photo-input').click()">
+      <div class="photo-preview" id="preview-box"
+           onclick="document.getElementById('photo-input').click()">
         <span class="placeholder">클릭하여<br>사진 선택</span>
       </div>
       <div>
         <input type="file" id="photo-input" accept="image/*" onchange="handlePhoto(event)" />
         <label for="photo-input" class="upload-btn">📁 사진 업로드</label>
-        <p style="font-size:0.78rem; color:#9aa; margin-top:8px;">JPG, PNG, GIF 등</p>
+        <p style="font-size:0.78rem; color:#9aa; margin-top:8px;">JPG, PNG 권장 / 5MB 이하</p>
       </div>
     </div>
   </div>
@@ -343,7 +237,9 @@
     <input type="text" id="input-dept" placeholder="예) 공과대학 컴퓨터공학과" />
   </div>
 
-  <button class="submit-btn" onclick="addMember()">+ 회원 등록하기</button>
+  <button class="submit-btn" id="submit-btn" onclick="addMember()">
+    + 회원 등록하기
+  </button>
 </div>
 
 <!-- 회원 목록 -->
@@ -354,8 +250,8 @@
   </div>
   <div class="members-grid" id="members-grid">
     <div class="empty-state">
-      <div class="empty-icon">🎾</div>
-      <p>아직 등록된 회원이 없습니다.<br>위 양식을 통해 첫 번째 회원을 등록해보세요!</p>
+      <div class="empty-icon">⏳</div>
+      <p>불러오는 중...</p>
     </div>
   </div>
 </div>
@@ -363,57 +259,111 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  let members = JSON.parse(localStorage.getItem('tennis_members') || '[]');
-  let currentPhotoData = null;
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ① 아래 두 값을 본인의 Supabase 프로젝트 값으로 교체하세요
+  const SUPABASE_URL      = 'https://YOUR_PROJECT_ID.supabase.co';
+  const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentPhotoFile = null;
+
+  // ── 사진 미리보기 ──
   function handlePhoto(e) {
     const file = e.target.files[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('5MB 이하 이미지를 선택해주세요.'); return;
+    }
+    currentPhotoFile = file;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      currentPhotoData = ev.target.result;
-      const box = document.getElementById('preview-box');
-      box.innerHTML = `<img src="${currentPhotoData}" alt="미리보기" />`;
+      document.getElementById('preview-box').innerHTML =
+        `<img src="${ev.target.result}" alt="미리보기" />`;
     };
     reader.readAsDataURL(file);
   }
 
-  function addMember() {
+  // ── 회원 등록 ──
+  async function addMember() {
     const name = document.getElementById('input-name').value.trim();
     const dept = document.getElementById('input-dept').value.trim();
-
     if (!name) { showToast('이름을 입력해주세요.'); return; }
     if (!dept) { showToast('소속을 입력해주세요.'); return; }
 
-    const member = {
-      id: Date.now(),
-      name,
-      dept,
-      photo: currentPhotoData
-    };
+    setLoading(true);
+    try {
+      let photo_url = null;
 
-    members.push(member);
-    saveAndRender();
-    resetForm();
-    showToast(`${name} 회원이 등록되었습니다!`);
+      // 사진이 있으면 Storage에 업로드
+      if (currentPhotoFile) {
+        const ext  = currentPhotoFile.name.split('.').pop();
+        const path = `${Date.now()}.${ext}`;
+        const { error: upErr } = await db.storage
+          .from('photos')
+          .upload(path, currentPhotoFile, { upsert: false });
+        if (upErr) throw upErr;
+
+        const { data: urlData } = db.storage.from('photos').getPublicUrl(path);
+        photo_url = urlData.publicUrl;
+      }
+
+      // DB에 회원 정보 저장
+      const { error } = await db.from('members').insert({ name, dept, photo_url });
+      if (error) throw error;
+
+      showToast(`${name} 회원이 등록되었습니다!`);
+      resetForm();
+      await loadMembers();
+    } catch (err) {
+      console.error(err);
+      showToast('등록 실패: ' + (err.message || '오류가 발생했습니다.'));
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function deleteMember(id) {
-    const m = members.find(m => m.id === id);
-    if (!m) return;
-    if (!confirm(`"${m.name}" 회원을 삭제하시겠습니까?`)) return;
-    members = members.filter(m => m.id !== id);
-    saveAndRender();
-    showToast('회원이 삭제되었습니다.');
+  // ── 회원 삭제 ──
+  async function deleteMember(id, photoUrl) {
+    if (!confirm('이 회원을 삭제하시겠습니까?')) return;
+    setLoading(true);
+    try {
+      // Storage 이미지 삭제
+      if (photoUrl) {
+        const path = photoUrl.split('/photos/')[1];
+        if (path) await db.storage.from('photos').remove([path]);
+      }
+      const { error } = await db.from('members').delete().eq('id', id);
+      if (error) throw error;
+      showToast('회원이 삭제되었습니다.');
+      await loadMembers();
+    } catch (err) {
+      showToast('삭제 실패: ' + (err.message || '오류가 발생했습니다.'));
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function saveAndRender() {
-    localStorage.setItem('tennis_members', JSON.stringify(members));
-    renderMembers();
+  // ── 회원 목록 불러오기 ──
+  async function loadMembers() {
+    const { data, error } = await db
+      .from('members')
+      .select('*')
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error(error);
+      showToast('목록 로드 실패: ' + error.message);
+      return;
+    }
+    renderMembers(data || []);
   }
 
-  function renderMembers() {
-    const grid = document.getElementById('members-grid');
+  // ── 렌더링 ──
+  function renderMembers(members) {
+    const grid  = document.getElementById('members-grid');
     const badge = document.getElementById('count-badge');
     badge.textContent = `총 ${members.length}명`;
 
@@ -428,9 +378,11 @@
 
     grid.innerHTML = members.map(m => `
       <div class="member-card">
-        <button class="delete-btn" onclick="deleteMember(${m.id})" title="삭제">✕</button>
-        ${m.photo
-          ? `<img class="card-photo" src="${m.photo}" alt="${m.name}" />`
+        <button class="delete-btn"
+          onclick="deleteMember('${m.id}', ${m.photo_url ? `'${m.photo_url}'` : 'null'})"
+          title="삭제">✕</button>
+        ${m.photo_url
+          ? `<img class="card-photo" src="${m.photo_url}" alt="${escHtml(m.name)}" />`
           : `<div class="card-photo-placeholder">👤</div>`
         }
         <div class="card-info">
@@ -441,23 +393,35 @@
     `).join('');
   }
 
+  // ── 폼 초기화 ──
   function resetForm() {
     document.getElementById('input-name').value = '';
     document.getElementById('input-dept').value = '';
     document.getElementById('photo-input').value = '';
-    currentPhotoData = null;
-    document.getElementById('preview-box').innerHTML = '<span class="placeholder">클릭하여<br>사진 선택</span>';
+    currentPhotoFile = null;
+    document.getElementById('preview-box').innerHTML =
+      '<span class="placeholder">클릭하여<br>사진 선택</span>';
+  }
+
+  function setLoading(on) {
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = on;
+    btn.innerHTML = on
+      ? '<span class="spinner"></span>처리 중...'
+      : '+ 회원 등록하기';
   }
 
   function escHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
+    setTimeout(() => t.classList.remove('show'), 2800);
   }
 
   // 엔터키로 등록
@@ -467,7 +431,8 @@
     });
   });
 
-  renderMembers();
+  // 초기 로드
+  loadMembers();
 </script>
 </body>
 </html>
